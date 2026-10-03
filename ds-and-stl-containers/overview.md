@@ -1,7 +1,23 @@
 sequence containers:
     - array
     - vector
-    - deque
+    - deque: dynamic size, can be expanded or contracted on both ends and front
+        - []
+        - at()
+        - back()
+        - begin()
+        - clear()
+        - empty()
+        - end()
+        - erase()
+        - front()
+        - insert()
+        - pop_back()
+        - pop_front()
+        - push_back()
+        - push_front()
+        - resize()
+        - size()
     - forward list
     - list
 
