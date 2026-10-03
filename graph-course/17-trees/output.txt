@@ -1,16 +1,1 @@
-Depth of nodes:
-g.dep[0] = 0
-g.dep[1] = 1
-g.dep[2] = 2
-g.dep[3] = 2
-g.dep[4] = 3
-g.dep[5] = 3
-g.dep[6] = 3
-g.dep[7] = 3
-g.dep[8] = 4    
-g.dep[9] = 5
-g.dep[10] = 4
-g.dep[11] = 5
-g.dep[12] = 4
-LCA(9, 12): 1
-LCA(10, 8): 2
+1
