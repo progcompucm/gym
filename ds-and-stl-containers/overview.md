@@ -28,10 +28,10 @@ associative containers:
     - multimap
 
 unordered associative containers:
-    - unordered sest O(1)
+    - unordered set O(1)
     - unordered map (hashtable)
-    - unordered_multiset
-    - unordered_multimap
+        - unordered_multiset
+        - unordered_multimap
 
 containers adaptors
     - stack
