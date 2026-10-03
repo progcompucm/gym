@@ -7,6 +7,7 @@ using ll = long long;
 using vll = vector<ll>;
 using pll = pair<ll, ll>;
 using vpll = vector<pll>;
+using vvll = vector<vll>
 
 #define F first
 #define S second
@@ -26,9 +27,25 @@ void p(T&& t, V&&... v){
 ```
 
 # Graph 
-## BFS
+## If struct is needed
 ```cpp
-void bfs(vector<vll>& adj, ll root_node){
+struct Graph{
+    ll N;
+    vvall adj;
+
+    Graph(ll n) : N(n), adj(n){}
+
+    void add_edge(ll u, ll v){
+        adj[u].pb(v);
+        adj[v].pb(u);
+    }
+}
+```
+
+## BFS
+### Base Idea
+```cpp
+void bfs(vvll& adj, ll root_node){
     vector<bool> vis(adj.size(), false);
     queue<ll> q;
     q.push(root_node);
@@ -44,3 +61,78 @@ void bfs(vector<vll>& adj, ll root_node){
     }
 }
 ```
+
+### BFS for compute dists and parents
+```cpp
+void bfs(vvll& adj, ll root_node, ll N){
+    vll dist(N, -1);
+    vll parent(N, -1);
+    queue<ll> q;
+    q.push(root_node);
+    parent[root_node] = root_node;
+    dist[root_node] = 0;
+    while(!q.empty()){
+        ll u = q.front();
+        q.pop();
+        for(ll v : adj[u]){
+            if(dist[v] != -1) continue;
+            q.push(v);
+            parent[v] = u;
+            dist[v] = dist[u] + 1;
+        }
+    }
+}
+```
+
+### Showing the path using the parent arr
+```cpp
+ll temp = dest;
+while(temp != root_node){
+    cout << temp << " -- ";
+    temp = parent[temp];
+}
+cout << root_node << "\n";
+```
+
+### Cycle Detection (Struct impl)
+```cpp
+bool has_cycle(ll root_node){
+    vll parent(N, -1);
+    queue<ll> q;
+    parent[root_node] = root_node;
+    q.push(root_node);
+    while(!q.empty()){
+        ll u = q.front();
+        q.pop();
+        for(ll v : adj[u]){
+            if(parent[v] == -1){
+                parent[v] = u;
+                q.push(v);
+            }else if(v != parent[u]){
+                return true;
+            }
+        }
+    }
+    return false;
+}
+```
+
+## DFS
+### Base Idea
+```cpp
+void dfs_helper(ll node, vector<bool>& vis, vvll& adj){
+    vis[node] = true;
+    // make a dfs call on all its unvisited nbrs
+    for(ll v : adj[node]){
+        if(vis[v]) continue;
+        vis[v] = true;
+        dfs_helper(v, vis, adj);
+    }
+}
+
+void dfs(vvll& adj, ll N, ll root_node){
+    vector<bool> vis(N, false);
+    dfs_helper(root_node, vis, adj);
+}
+```
+
