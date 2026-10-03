@@ -14,7 +14,7 @@ using vvll = vector<vll>
 #define pb push_back
 
 #define all(x) (x).begin(), (x).end()
-#define sz(x) ((ll)(x).size())
+#define len(x) ((ll)(x).size())
 
 #define rep(i, a, b) for(ll i = (a); i < (b); i++)
 
@@ -31,6 +31,7 @@ void p(T&& t, V&&... v){
 ```cpp
 struct Graph{
     ll N;
+    // or vector<vpll> adj => adj[u].pb({ v, w })
     vvall adj;
 
     Graph(ll n) : N(n), adj(n){}
@@ -46,7 +47,7 @@ struct Graph{
 ### Base Idea
 ```cpp
 void bfs(vvll& adj, ll root_node){
-    vector<bool> vis(adj.size(), false);
+    vector<bool> vis(len(adj), false);
     queue<ll> q;
     q.push(root_node);
     vis[root_node] = true;
@@ -155,5 +156,48 @@ bool dfs(ll node, vector<bool>& vis, ll parent){
 bool has_cycle(){
     vector<bool> vis(N, false);
     return dfs(0, vis, -1);
+}
+```
+
+### Dijkstra (Struct impl)
+```cpp
+ll dijkstra(ll src, ll dest){
+    vll dist(N, LLONG_MAX);
+    set<pll> s;
+    vll parent(N, -1);
+
+    dist[src] = 0;
+    s.insert({ 0, src });
+
+    while(!s.empty()){
+        auto it = s.begin();
+        ll node = it->second;
+        ll curr_dist = it->first;
+        s.erase(it);
+
+        for(auto [v, w] : adj[node]){
+            if(curr_dist + w < dist[v]){
+                // remove if neighbor already exists in the set
+                auto f = s.find({ dist[v], v });
+                if(f != s.end()) s.erase(f);
+
+                // insert the updated value with the new dist
+                dist[v] = curr_dist + w;
+                parent[v] = node;
+                s.insert({ dist[v], v });
+            }
+        }
+    }
+
+    // if path is required
+    vll path;
+    ll temp = dest;
+    while(temp != -1){
+        path.pb(temp);
+        temp = parent[temp];
+    }
+    reverse(all(path));
+
+    return dist[dest];
 }
 ```
