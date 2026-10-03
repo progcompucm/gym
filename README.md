@@ -178,6 +178,32 @@ bool has_cycle(){
 }
 ```
 
+### Check for bipartite (Struct impl)
+```cpp
+bool is_bipartite(){
+    vll color(N, -1);
+    for(ll root = 0; root < N; root++){
+        if(color[root] != -1) continue;
+        queue<ll> q;
+        q.push(root);
+        color[root] = 0;
+        while(!q.empty()){
+            ll u = q.front();
+            q.pop();
+            for(ll v : adj[u]){
+                if(color[v] == -1){
+                    color[v] = 1 - color[u];
+                    q.push(u);
+                }else if(color[v] == color[u]){
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+```
+
 ### Can be useful...
 ```cpp
 // vector<string> cities = {"Delhi", "London", "Paris", "New York"};
