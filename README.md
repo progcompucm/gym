@@ -3,18 +3,20 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+const ll INF = LLONG_MAX / 4;
+
 using ll = long long;
 using vll = vector<ll>;
 using pll = pair<ll, ll>;
 using vpll = vector<pll>;
-using vvll = vector<vll>
+using vvll = vector<vll>;
 
 #define F first
 #define S second
 #define pb push_back
 
 #define all(x) (x).begin(), (x).end()
-#define len(x) ((ll)(x).size())
+#define sz(x) ((ll)(x).size())
 
 #define rep(i, a, b) for(ll i = (a); i < (b); i++)
 
@@ -51,7 +53,7 @@ int main(){
 struct Graph{
     ll N;
     // or vector<vpll> adj => adj[u].pb({ v, w })
-    vvall adj;
+    vvll adj;
 
     Graph(ll n) : N(n), adj(n){}
 
@@ -66,7 +68,7 @@ struct Graph{
 ### Base Idea
 ```cpp
 void bfs(vvll& adj, ll root_node){
-    vector<bool> vis(len(adj), false);
+    vector<bool> vis(sz(adj), false);
     queue<ll> q;
     q.push(root_node);
     vis[root_node] = true;
@@ -162,7 +164,6 @@ bool dfs(ll node, vector<bool>& vis, ll parent){
     vis[node] = true;
     for(ll v : adj[node]){
         if(!vis[v]){
-            vis[v] = true;
             bool nbr_found_cycle = dfs(v, vis, node);
             if(nbr_found_cycle) return true;
             continue;
@@ -174,6 +175,10 @@ bool dfs(ll node, vector<bool>& vis, ll parent){
 
 bool has_cycle(){
     vector<bool> vis(N, false);
+    /*for(ll i = 0; i < N; i++){
+        if(vis[i]) continue;
+        if(dfs(i, vis, -1)) return true;
+    }*/
     return dfs(0, vis, -1);
 }
 ```
@@ -193,7 +198,7 @@ bool is_bipartite(){
             for(ll v : adj[u]){
                 if(color[v] == -1){
                     color[v] = 1 - color[u];
-                    q.push(u);
+                    q.push(v);
                 }else if(color[v] == color[u]){
                     return false;
                 }
@@ -286,6 +291,30 @@ ll dijkstra(ll src, ll dest){
 }
 ```
 
+### Dijkstra (Struct impl using priority_queue)
+```cpp
+ll dijkstra(vvpll &adj, ll src, ll dest){
+    vll dist(N, LLONG_MAX);
+    dist[src] = 0;
+    priority_queue<pll, vpll, greater<pll>> pq;
+    pq.push({ 0, src });
+    
+    while(!pq.empty()){
+        auto [d, u] = pq.top(); 
+        pq.pop();
+        if(d != dist[u]) continue; 
+        if(u == dest) return d;
+        for(auto [v, w] : adj[u]){
+            if(dist[u] + w < dist[v]){
+                dist[v] = dist[u] + w;
+                pq.push({ dist[v], v });
+            }
+        }
+    }
+    return dist[dest];
+}
+```
+
 ### Floyd Warshall (Graph Impl Struct with Adjacency Matrix needed)
 ```cpp
 struct Graph{
@@ -314,7 +343,7 @@ struct Graph{
 ### Floyd Warshall (Negative weights) (Edge-struct-based Graph struct impl)
 ```cpp
 struct Edge{
-    ll u, v w;
+    ll u, v, w;
 };
 
 struct Graph{
@@ -337,6 +366,40 @@ struct Graph{
         }
         return dist;
     }
+}
+```
+
+### Topological Sort
+Se aplica a un grafo dirigido sin ciclos (DAG). Es una forma de ordenar los nodos de modo que
+para cada arista u -> v, u aparezca antes que v.
+Ejemplo: cursos con prerequisitos.
+    - Álgebra -> Cálculo -> Física.
+    - Programación -> Estructura de Datos.
+Cómo:
+    - Calcula el grado de entrada de cada nodo.
+    - Mete a una cola los nodos con grado 0, que no dependen de nadie.
+    - Saca uno, agregalo al orden y restale 1 al grado de sus vecinos. Los que lleguen a 0 entran a la cola.
+    - Si al final procesmos menos de n nodos, hay un ciclo y el orden es imposible (por ejemplo A necesita B y B necesita A). 
+Para:
+    - Detectar ciclos grafos dirigidos.
+    - Planificar tareas con dependencias.
+```cpp
+vll topological_sort(vvll &adj, ll n){
+    vll indeg(n, 0);
+    for(ll u = 0; u < n; u++) {
+        for(ll v : adj[u]) indeg[v]++;
+    }
+    queue<ll> q;
+    for(ll i = 0; i < n; i++) if(indeg[i] == 0) q.push(i);
+    vll topo;
+    while(!q.empty()) {
+        ll u = q.front(); q.pop();
+        topo.pb(u);
+        for(ll v : adj[u]) {
+            if(--indeg[v] == 0) q.push(v);
+        }
+    }
+    return topo.size() == n ? topo : vll(); 
 }
 ```
 
@@ -379,9 +442,11 @@ struct Graph{
         adj[v].pb(u);
     }
 
+    // dfs(root, root)
     void dfs(ll node, ll parent){
         p[node] = parent;
-        dep[node] = dep[parent] + 1;
+        if(node == parent) dep[node] = 0;
+        else dep[node] = dep[parent] + 1;
         for(ll v : adj[node]){
             if(v == parent) continue;
             dfs(v, node);
@@ -415,11 +480,11 @@ struct Graph{
     vvll adj, up;
     vll dep;
 
-    Graph(ll n) : 
+    Graph(ll n) :
         N(n),
-        LOG(log2(n) + 1), 
-        up(n, vll(LOG, 0)), 
-        dep(n, 0), 
+        LOG(log2(n) + 1),
+        up(n, vll(LOG, 0)),
+        dep(n, 0),
         adj(n){}
 
     void add_edge(ll u, ll v){
@@ -427,9 +492,10 @@ struct Graph{
         adj[v].pb(u);
     }
 
+    // dfs(root, root) first 
     void dfs(ll node, ll parent){
         up[node][0] = parent;
-        dep[node] = dep[parent] + 1;
+        dep[node] = node == parent ? 0 : dep[parent] + 1;
 
         for(ll i = 1; i < LOG; i++){
             up[node][i] = up[up[node][i - 1]][i - 1];
@@ -515,11 +581,62 @@ bool is_symmetric(Node* root){
 }
 ```
 
+# DSU
+Es una estructura que mantiene grupos de elementos y responde dos preguntas:
+- find(x): ¿en qué grupo está x?
+- unite(a, b): junta los grupos de a y b.
+Ejemplo: tenemos ciudades 1..5 y vamos leyendo carreteras:
+- Carretera 1-2: unite(1, 2) -> grupos {1, 2}, {3}, {4}, {5}
+- Carretera 4-5: unite(4, 5) -> grupos {1, 2}, {3}, {4, 5}
+- ¿Están 1 y 5 conectadas? find(1) != find(5) => no.
+Sirve para:
+- Saber si dos nodos están conectados sin hacer un BFS cada vez.
+- Contar componentes conexas mientras se agregan aristas (Road Construction).
+```cpp
+struct DSU{
+    vll p, sz;
+    DSU(ll n){
+        p.resize(n);
+        sz.assign(n, 1);
+        iota(all(p), 0);
+    }
+
+    ll find(ll x){
+        return p[x] == x ? x : p[x] : find(p[x]);
+    }
+
+    bool unite(ll a, ll b){
+        a = find(a), b = find(b);
+        if(a == b) return false;
+        if(sz[a] < sz[b]) swap(a, b);
+        p[b] = a;
+        sz[a] += sz[b];
+        return true;
+    }
+};
+```
+
+# Kruskal
+Dado un grafo con pesos, elegir las aristas que conectan todos los nodos con el menor costo total sin formar ciclos.
+Ejemplo: construir carreteras que conecten todas las ciudades gastando lo minimo. Kruskal siempre toma la más barata que aún aporte una conexión nueva. 
+Grafo conexo: Un grafo no dirigido es conexo si desde cualquier nodo podemos llegar a cualquier otro siguiendo aristas. Es decir que todo esta en una sola pieza. Un unico componente. 
+```cpp
+ll kruskal(ll n, vector<Edge>& e){
+    sort(all(e), [](const Edge& a, const Edge& b){ return a.w < b.w; });
+    DSU d(n);
+    ll total = 0;
+    for(auto& [u, v, w] : e){
+        if(d.unite(u, v)) total += w;
+    }
+    return d.comps == 1 ? total : -1;
+}
+```
+
 # Segment Tree
 ## Base Impl
 ```cpp
 // vll v = {1, 2, 3, 4, 5, 6, 7, 8};
-// SegTree tree(len(v));
+// SegTree tree(sz(v));
 // tree.build(v);
 // p(tree.query(0, 4)) => 15.
 struct SegTree{
@@ -605,9 +722,35 @@ ll lis(vll& a){
 }
 ```
 
+## Hamiltonian Path (number of routes for n)
+```cpp
+// Cantidad de caminos de 0 a n-1 que pasan por todos los nodos. n <= 20.
+// in[v] = mascara de nodos u con arista u -> v
+ll hamiltonian_paths(vvll &adj, ll n) {
+    const ll MOD = 1e9+7;
+    vector<vll> dp(1 << n, vll(n, 0));
+    dp[1][0] = 1;
+    
+    for(ll mask = 1; mask < (1 << n); mask++) {
+        if(!(mask & 1)) continue;
+        for(ll last = 0; last < n; last++) {
+            if(!(mask & (1 << last))) continue;
+            if(dp[mask][last] == 0) continue;
+            for(ll nxt : adj[last]) {
+                if(mask & (1 << nxt)) continue;
+                dp[mask | (1 << nxt)][nxt] = 
+                    (dp[mask | (1 << nxt)][nxt] + dp[mask][last]) % MOD;
+            }
+        }
+    }
+    return dp[(1 << n) - 1][n - 1]; 
+}
+```
+
 # Common Algorithms
 ## Longest Subarray (Two Pointers / Sliding Window)
 ```cpp
+// Only works when a[i] >= 0
 ll longest_subarr(vll& a, ll k){
     ll l = 0, sum = 0, ans = 0;
     for(ll r = 0; r < a.size(); r++){
@@ -665,8 +808,8 @@ string rev_words(string s){
 ll fast_mod(ll a, ll b, ll mod){
     ll ans = 1;
     while(b > 0){
-        if(b & 1) ans = (ans * a) % mod;
-        a = (a * a) % mod;
+        if(b & 1) ans = (__int128)ans * a % mod;
+        a = (__int128)a * a % mod;
         b >>= 1;
     }
     return ans;
@@ -780,5 +923,30 @@ ll lee(vector<vll>& grid, pll start, pll end){
     }
 
     return dist[end.F][end.S];
+}
+```
+
+## Counting Rooms
+```cpp
+ll count_rooms(vector<string>& g){
+    ll n = len(g), m = len(g[0]), ans = 0;
+    ll dx[] = {-1, 1, 0, 0}, dy[] = {0, 0, -1, 1};
+    rep(i, 0, n) rep(j, 0, m){
+        if(g[i][j] != '.') continue;
+        ans++;
+        vpll st = {{i, j}};
+        g[i][j] = '#';
+        while(!st.empty()){
+            auto [x, y] = st.back(); 
+            st.pop_back();
+            rep(d, 0, 4){
+                ll nx = x + dx[d], ny = y + dy[d];
+                if(nx < 0 || nx >= n || ny < 0 || ny >= m || g[nx][ny] != '.') continue;
+                g[nx][ny] = '#';
+                st.pb({nx, ny});
+            }
+        }
+    }
+    return ans;
 }
 ```
