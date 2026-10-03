@@ -487,3 +487,148 @@ bool is_symmetric(Node* root){
     return is_mirror(root->left, root->right);
 }
 ```
+
+# Segment Tree
+## Base Impl
+```cpp
+// vll v = {1, 2, 3, 4, 5, 6, 7, 8};
+// SegTree tree(len(v));
+// tree.build(v);
+// p(tree.query(0, 4)) => 15.
+struct SegTree{
+    vll st;
+    ll N;
+
+    SegTree(ll n) : N(n), st(4 * n, 0){}
+
+    void build(ll start, ll end, ll node, vll& v){
+        // leaf node base case
+        if(start == end){
+            st[node] = v[start];
+            return;
+        }
+
+        ll mid = (start + end) / 2;
+        // left subtree is (start, mid)
+        build(start, mid, 2 * node + 1, v);
+
+        // right subtree is (mid + 1, end)
+        build(mid + 1, end, 2 * node + 2, v);
+        
+        st[node] = st[node * 2 + 1] + st[node * 2 + 2];
+    }
+
+    ll query(ll start, ll end, ll l, ll r, ll node){
+        // non overlapping case
+        if(start > r || end < l) return 0;
+        
+        // complete overlap
+        if(start >= l && end <= r) return st[node];
+
+        // partial case
+        ll mid = (start + end) / 2;
+        ll q1 = query(start, mid, l, r, 2 * node + 1); 
+        ll q2 = query(mid + 1, end, l, r, 2 * node + 2);
+        return q1 + q2;  
+    }
+    
+    ll query(ll l, ll r){
+        return query(0, N - 1, l, r, 0);
+    }
+
+    void build(vll& v){
+        build(0, N - 1, 0, v);
+    }
+};
+```
+
+# Dynamic Programming
+## Longest Common Subsequence
+```cpp
+// a = [1, 7, 1, 8, 3, 6, 5, 9]
+// b = [7, 3, 9, 8]
+// ans => 3 => 7, 3, 9
+ll lcs(string a, string b){
+    ll n = a.size(), m = b.size();
+    vector<vll> dp(n + 1, vll(m + 1, 0));
+    for(ll i = 1; i <= n; i++){
+        for(ll j = 1; j <= m; j++){
+            if(a[i - 1] == b[j - 1]){
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+            }else{
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+    return dp[n][m];
+}
+```
+
+## Longest Increase Subsequence
+```cpp
+ll lis(vll& a){
+    vll dp;
+    for(ll x : a){
+        // if non-decreasing => upper_bound
+        auto it = lower_bound(all(dp), x);
+        if(it == dp.end()) dp.push_back(x);
+        else *it = x;
+    }
+    return dp.size();
+}
+```
+
+# Common Algorithms
+## Longest Subarray (Two Pointers / Sliding Window)
+```cpp
+ll longest_subarr(vll& a, ll k){
+    ll l = 0, sum = 0, ans = 0;
+    for(ll r = 0; r < a.size(); r++){
+        sum += a[r];
+        while(sum > k){
+            sum -= a[l];
+            l++;
+        }
+        if(sum == k) ans = max(ans, r - l + 1);
+    }
+    return ans;
+}
+```
+
+## Palindromic Substrings
+```cpp
+ll count_palindromic_substrings(string s){
+    ll n = s.size();
+    ll ans = 0;
+
+    auto expand = [&](ll l, ll r){
+        while(l >= 0 && r < n && s[l] == s[r]){
+            ans++;
+            l--;
+            r++;
+        }
+    };
+
+    for(ll i = 0; i < n; i++){
+        expand(i, i);
+        expand(i, i + 1);
+    }
+
+    return ans;
+}
+```
+
+## Reverse Words
+```cpp
+string rev_words(string s){
+    reverse(s.begin(), s.end());
+    ll l = 0;
+    for(ll r = 0; r <= s.size(); r++){
+        if(r == s.size() || s[r] == ' '){
+            reverse(s.begin() + l, s.begin() + r);
+            l = r + 1;
+        }
+    }
+    return s;
+}
+```
