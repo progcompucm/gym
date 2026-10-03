@@ -1,3 +1,43 @@
+# STL 
+| Container | Methods  |
+| :--- | :---: | 
+| vector<T> | push_back, pop_back, back, resize, assign, insert, erase | 
+| deque<T> | push_front, back, pop_front, back, [] |
+| queue<T> | push, pop, front, empty |
+| stack<T> | push, pop, top |
+| priority_queue<T> | push, top, pop |
+| set<T>, multiset<T> | insert, erase, find, count, lower_bound, upper_bound, begin, rbegin |
+| map<K, V> | [], find, count, erase, lower_bound |
+| unordered_map / map | insert, find, count, erase, reserve |
+| string | substr, find, compare, stoi, to_string |
+
+| Algorithms | Qué hace  |
+| :--- | :---: | 
+| sort(all(v)) | ... |
+| lower_bound(all(v), x) | first element >= x |
+| upper_bound(all(v), x) | first element > x |
+| binary_search(all(v), x) | exists x? |
+| reverse(all(x)) | ... |
+| unique(all(v)) | elimina consecutivos repetidos |
+| min_element | ... |
+| max_element | ... |
+| accumulate(all(v), 0LL) | Sum |
+| count(all(v), x)/count_if | ... |
+| find(all(v), x) | First x |
+| any_of / all_of / none_of | ... |
+| swap(a, b) | ... |
+| gcd(a, b) | ... |
+| lcm(a, b) | ... |
+| is_sorted | ... |
+| shuffle(all(v), rng) / mt19937 rng(time(0)) | ... |
+
+| Algorithms | Qué hace  |
+| :--- | :---: | 
+| s.substr(pos, len) | ... |
+| s.find(t) / s.rfind(t) | pos or string::npos |
+| stoi, stoll, stod | ... |
+| isdigit, isalpha, islower, toupper, tolower | ... |
+
 # Base Template
 ```cpp
 #include <bits/stdc++.h>
@@ -340,7 +380,7 @@ struct Graph{
 }
 ```
 
-### Floyd Warshall (Negative weights) (Edge-struct-based Graph struct impl)
+### Bellman-Ford (Negative weights) (Edge-struct-based Graph struct impl)
 ```cpp
 struct Edge{
     ll u, v, w;
@@ -595,14 +635,11 @@ Sirve para:
 ```cpp
 struct DSU{
     vll p, sz;
-    DSU(ll n){
-        p.resize(n);
-        sz.assign(n, 1);
-        iota(all(p), 0);
-    }
+    ll comps;
+    DSU(ll n) : p(n), sz(n, 1), comps(n){ iota(all(p), 0); }
 
     ll find(ll x){
-        return p[x] == x ? x : p[x] : find(p[x]);
+        return p[x] == x ? x : p[x] = find(p[x]); 
     }
 
     bool unite(ll a, ll b){
@@ -611,6 +648,7 @@ struct DSU{
         if(sz[a] < sz[b]) swap(a, b);
         p[b] = a;
         sz[a] += sz[b];
+        comps--;
         return true;
     }
 };
