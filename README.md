@@ -136,3 +136,24 @@ void dfs(vvll& adj, ll N, ll root_node){
 }
 ```
 
+### Cycle Detection (Struct impl)
+```cpp
+bool dfs(ll node, vector<bool>& vis, ll parent){
+    vis[node] = true;
+    for(ll v : adj[node]){
+        if(!vis[v]){
+            vis[v] = true;
+            bool nbr_found_cycle = dfs(v, vis, node);
+            if(nbr_found_cycle) return true;
+            continue;
+        }
+        if(v != parent) return true;
+    }
+    return false;
+}
+
+bool has_cycle(){
+    vector<bool> vis(N, false);
+    return dfs(0, vis, -1);
+}
+```
