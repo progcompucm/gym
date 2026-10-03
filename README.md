@@ -24,3 +24,23 @@ void p(T&& t, V&&... v){
     cout << '\n';
 }
 ```
+
+# Graph 
+## BFS
+```cpp
+void bfs(vector<vll>& adj, ll root_node){
+    vector<bool> vis(adj.size(), false);
+    queue<ll> q;
+    q.push(root_node);
+    vis[root_node] = true;
+    while(!q.empty()){
+        ll u = q.front();
+        q.pop();
+        for(ll v : adj[u]){
+            if(vis[v]) continue;
+            vis[v] = true;
+            q.push(v);
+        }
+    }
+}
+```
