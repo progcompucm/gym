@@ -462,6 +462,33 @@ struct Graph{
 }
 ```
 
+## Tree Diameter (biggest dist/path of any two nodes in the tree)
+```cpp
+ll diameter(vvll& adj){
+    ll n = adj.size();
+    auto bfs = [&](ll src){
+        vll dist(n, -1);
+        queue<ll> q;
+        q.push(src);
+        dist[src] = 0;
+        while(!q.empty()){
+            ll u = q.front();
+            q.pop();
+            for(ll v : adj[u]){
+                if(dist[v] != -1) continue;
+                dist[v] = dist[u] + 1;
+                q.push(v);
+            }
+        }
+        return dist;
+    };
+    vll dist = bfs(0);
+    ll A = max_element(all(dist)) - dist.begin();
+    dist = bfs(A);
+    return *max_element(all(dist));
+}
+```
+
 ## Symmetric Tree
 ```cpp
 // Node* root = new Ndde(...);
