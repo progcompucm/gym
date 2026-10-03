@@ -632,3 +632,126 @@ string rev_words(string s){
     return s;
 }
 ```
+
+## Fast Mod
+```cpp
+ll fast_mod(ll a, ll b, ll mod){
+    ll ans = 1;
+    while(b > 0){
+        if(b & 1) ans = (ans * a) % mod;
+        a = (a * a) % mod;
+        b >>= 1;
+    }
+    return ans;
+}
+```
+
+## Largest Rectangle
+```cpp
+ll largest_rectangle(vll& h){
+    ll n = h.size();
+    stack<ll> st;
+    ll ans = 0;
+
+    for(ll i = 0; i <= n; i++){
+        ll curr = (i == n ? 0 : h[i]);
+
+        while(!st.empty() && h[st.top()] > curr){
+            ll height = h[st.top()];
+            st.pop();
+
+            ll left = st.empty() ? -1 : st.top();
+            ll width = i - left - 1;
+
+            ans = max(ans, height * width);
+        }
+
+        if(i < n) st.push(i);
+    }
+
+    return ans;
+}
+```
+
+## Longest Consecutive Numbers
+```cpp
+ll longest_consecutive_numbers(vll& a){
+    unordered_set<ll> st(all(a));
+    ll ans = 0;
+    for(ll x : st){
+        if(!st.count(x - 1)){
+            ll curr = x;
+            ll len = 1;
+            while(st.count(curr + 1)){
+                curr++;
+                len++;
+            }
+            ans = max(ans, len);
+        }
+    }
+    return ans;
+}
+```
+
+## Max Sum Subarray
+```cpp
+ll max_subarray_sum(vll& a){
+    ll curr = a[0];
+    ll ans = a[0];
+
+    for(ll i = 1; i < a.size(); i++){
+        curr = max(a[i], curr + a[i]);
+        ans = max(ans, curr);
+    }
+    
+    return ans;
+}
+```
+
+## Lee Algorithm
+```cpp
+/**
+S . . # . .
+. # . # . .
+. # . . . .
+. # # # # .
+. . . . . E
+
+0 = camino
+1 = obstáculo
+S = (0,0)
+E = (4,5)
+
+Camino minimo: S → ↓ → ↓ → → → ↓ → → → E
+*/
+ll lee(vector<vll>& grid, pll start, pll end){
+    ll n = grid.size();
+    ll m = grid[0].size();
+    
+    vector<vll> dist(n, vll(m, -1));
+    queue<pll> q;
+    q.push(start);
+    dist[start.F][start.S] = 0;
+
+    ll dx [] = {-1, 1, 0, 0};
+    ll dy[] = {0, 0, -1, 1};
+    while(!q.empty()){
+        auto [x, y] = q.front();
+        q.pop();
+
+        for(ll d = 0; d < 4; d++){
+            ll nx = x + dx[d];
+            ll ny = y + dy[d];
+            
+            if(nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
+            if(grid[nx][ny] == 1) continue;
+            if(dist[nx][ny] != -1) continue;
+
+            dist[nx][ny] = dist[x][y] + 1,
+            q.push({ nx, ny });
+        }
+    }
+
+    return dist[end.F][end.S];
+}
+```
