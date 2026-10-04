@@ -38,6 +38,8 @@
 | stoi, stoll, stod | ... |
 | isdigit, isalpha, islower, toupper, tolower | ... |
 
+# 
+
 # Base Template
 ```cpp
 #include <bits/stdc++.h>
