@@ -40,22 +40,8 @@ void solve(){
         g[vi].pb(ui);
     }
 
-    rep(i, 1, n + 1){
-        cout << "g[" << i << "] = [";
-        each(neigh, g[i]){
-            cout << neigh << ", ";
-        }
-        cout << "]\n";
-    }
-
-    each(pr, c){
-        auto [edge, color] = pr;
-        cout << "c[{ " << edge.first << ", " << edge.second << " }] = " << color << "\n";
-    }
-
     vvll circuits;
     vector<bool> vis(n + 1, false);
-
     ll u = 1;
     each(v, g[u]){
         circuits.pb({ u, v });
@@ -68,44 +54,14 @@ void solve(){
             vis[u] = true;
             vis[v] = true;
             vis[v_neigh] = true;
-
-            cout << "****************\n";
-            cout << "Base Path: ";
-            each(val, path){
-                cout << val << " - ";
-            }
-            cout << "\nNeighbors: ";
-            each(val, g[v]){
-                cout << val << " - ";
-            }
-            cout << "\n***************";
-
             while(!q.empty()){
                 ll x = q.front();
                 q.pop();
                 path.pb(x);
-                p("\n: x = ", x);
-                cout << ": Path: ";
-                each(val, path){
-                    cout << val << " - ";
-                }
-                cout << "\n";
-                cout << ": Neighbors: ";
-                each(val, g[x]){
-                    cout << val << ", ";
-                }
-                cout << "\n-------------\n";
                 each(neigh, g[x]){
-                    p(": neigh = ", neigh);
-                    p("::: visited = ", vis[neigh]);
                     if(u != neigh && vis[neigh]) continue;
                     if(u == neigh){
                         path.pb(u);
-                        cout << "==> Closed-Path: ";
-                        each(val, path){
-                            cout << val << " - ";
-                        }
-                        cout << "\n";
                         circuits.pb(path);
                         path = { u, v, x };
                         continue;
@@ -113,18 +69,9 @@ void solve(){
                     vis[neigh] = true;
                     q.push(neigh);
                 }
-                cout << "-------------\n";
             }
         }
     }
-    p("Loops:");
-    each(loop, circuits){
-        each(val, loop){
-            cout << val << " - ";
-        }
-        cout << "\n";
-    }
-    p("-------------");
     ll ans = 0;
     each(loop, circuits){
         set<ll> colors;

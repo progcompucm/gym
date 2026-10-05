@@ -25,6 +25,32 @@ void p(T&& t, V&&... v){
     cout << endl;
 }
 
+void dfs(
+    ll node,
+    ll v,
+    ll u,
+    vll& path,
+    vector<bool>& vis,
+    vvll& g,
+    vvll& circuits
+){
+    vis[node] = true;
+    path.pb(node);
+    each(neigh, g[node]){
+        if(u != neigh && vis[neigh]) continue;
+        if(u == neigh){
+            path.pb(u);
+            circuits.pb(path);
+            path.pop_back();
+            continue;
+        }
+        vis[neigh] = true;
+        dfs(neigh, v, u, path, vis, g, circuits);
+    }
+    path.pop_back();
+    vis[node] = false;
+}
+
 void solve(){
     ll n, m;
     cin >> n >> m;
@@ -40,37 +66,20 @@ void solve(){
         g[vi].pb(ui);
     }
 
-    vvll circuits;
     vector<bool> vis(n + 1, false);
+    vvll circuits;
     ll u = 1;
     vis[u] = true;
+
     each(v, g[u]){
         vis[v] = true;
         circuits.pb({ u, v });
         each(v_neigh, g[v]){
             if(v_neigh == u) continue;
-            qll q;
-            q.push(v_neigh);
             vll path = { u, v };
-            vis[v_neigh] = true;
-
-            while(!q.empty()){
-                ll x = q.front();
-                q.pop();
-                path.pb(x);
-                each(neigh, g[x]){
-                    if(u != neigh && vis[neigh]) continue;
-                    if(u == neigh){
-                        path.pb(u);
-                        circuits.pb(path);
-                        path = { u, v, x };
-                        continue;
-                    }
-                    vis[neigh] = true;
-                    q.push(neigh);
-                }
-            }
-        }
+            dfs(v_neigh, v, u, path, vis, g, circuits); 
+        }   
+        vis[v] = false;
     }
 
     ll ans = 0;
