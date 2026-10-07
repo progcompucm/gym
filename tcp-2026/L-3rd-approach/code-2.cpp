@@ -29,16 +29,26 @@ void solve(){
     ll n, m;
     cin >> n >> m;
 
-    vector<set<ll>> nodes(m + 1), colors_by_node(n + 1);
+    vvll nodes(m + 1), colors_by_node(n + 1);
     for(ll i = 0; i < m; i++){
         ll u, v, c;
         cin >> u >> v >> c;
-        nodes[c].insert(u);
-        nodes[c].insert(v);
-        colors_by_node[u].insert(c);
-        colors_by_node[v].insert(c);
+        nodes[c].pb(u);
+        nodes[c].pb(v);
+        colors_by_node[u].pb(c);
+        colors_by_node[v].pb(c);
     }
 
+    rep(u, 1, m + 1){
+        sort(all(nodes[u]));
+        nodes[u].erase(unique(all(nodes[u])), nodes[u].end());
+    }
+
+    rep(c, 1, n + 1){
+        sort(all(colors_by_node[c]));
+        colors_by_node[c].erase(unique(all(colors_by_node[c])), colors_by_node[c].end());
+    }
+    
     vll cnt(m + 1, 0);
     ll ans = 0;
     rep(k, 1, m + 1){
