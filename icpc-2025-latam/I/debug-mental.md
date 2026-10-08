@@ -124,6 +124,7 @@ Y, los códigos de accesos que conectan nodos S con T (S < T) en una lista de ad
     g[3] = [6, 7]
     g[6] = [7, 8]
     g[7] = [8]
+Obviando que es dirigido. Pues, nos dicen que nos podemos mover desde S a T con (S < T)... 
 Siempre, debemos partir desde g[1]. Por lo tanto, por defecto, y dado que nada nos lo impide,
 partimos desde el primer nodo conectado a g[1], en este caso, g[2].
 Al hacer esto, se nos bloquea g[2 + 4] = g[6]. 
@@ -150,14 +151,14 @@ Por lo tanto, por cada uno de estos vecinos, intentaremos llegar a g[8] respetan
 Dentro de cada iteración:
 Declaramos un vector "blocked". Este no es global. Ya que si no podemos  llegar
 a través de un vecino de root_node, quizas podemos llegar por medio de otro:
-    vector<bool> blocked(2 * n, false)
+    // vector<bool> blocked(2 * n, false)
 Luego, para el BFS:
     queue<ll> q;
     vector<bool> seen(2 * N, false);
     q.push(neigh);
     seen[neigh] = true;
     while(!q.empty()){
-        ll x = q.top();
+        ll x = q.front();
         q.pop();
         each(v : g[x]){
             ...
@@ -167,8 +168,8 @@ Cada vez que miremos un vecino "v", lo marcaremos en blocked[v + N] y insertamos
 en la cola para mirar sus vecinos, hasta llegar al nodo 2 * N, en código:
     each(v : g[x]){
         if(seen[v]) continue;
-        if(blocked[v + N]) continue;
-        blocked[v + N] = true;
+        // if(blocked[v + N]) continue;
+        seen[v + N] = true;
         if(v == 2 * N) break;
         q.push(v);
     }
