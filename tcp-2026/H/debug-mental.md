@@ -33,7 +33,7 @@ Las rotaciones:
 Las palabras de cada puerta:
     vector<string> p(n);
     each(&x : p) cin >> p;
-Iteramos sobre p:
+Iteramos sobre p, y dentro:
     rep(i, 0, 6){
 
     }
@@ -41,7 +41,8 @@ En cada iteración sabemos que la rotación aplicada es r[i].
 Para cada caracter, aplicamos la rotación.
     string s;
     each(c : p[i]){
-        s += alph[(char_idx[c] + r[i]) % 25]
+        ll idx = (char_idx[tolower(c)] - r[i] + 26) % 26;
+        s += alph[idx]
     }
 Luego de aplicar la rotación, sabemos que nuestro target es:
     target = "regalo"
