@@ -52,8 +52,9 @@ Consultamos por la posición actual:
 Leemos la respuesta:
     ll v; 
     cin >> v;
-Si v > x, entonces:
-    rep(i, step - step_size, step_size + 1){
+Si v >= x, entonces:
+    p("R\n")
+    rep(i, max(1, step - step_size), step + 1){
         p("? ", i)
         cin >> v;
         if(v == x){
@@ -61,4 +62,3 @@ Si v > x, entonces:
             break;
         }
     }
-    
