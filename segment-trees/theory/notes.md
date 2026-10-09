@@ -108,3 +108,15 @@ Por lo tanto, ahora en el root node, sumando left + right => 14 + 7 = 21.
 
 Query = [2, 2]
 [0, 7] -> [0, 3] (Partial Overlap) -> [2, 3] (Partial Overlap) -> [2, 2] (Complete Overlap)
+
+¿Cómo hago un update?
+Si quisieramos actualizar el indice 2, con un valor de 10, nos ubicamos en la hoja (2, 2), actualizamos, y luego, 
+por consecuencia debemos actualizar todos sus ancestros (DFS):
+[2, 2] -> [2, 3] -> [0, 3] -> [0, 7]
+
+[2, 2] = 10
+[2, 3] = [2, 2] + [3, 3] = 19
+[0, 3] = [0, 1] + [2, 3] = 22
+[0, 7] = [0, 3] + [4, 7] = 39
+
+La complejidad de esto esta en función de la altura del segment tree, pues sera la cantidad de operaciones a realizar.
