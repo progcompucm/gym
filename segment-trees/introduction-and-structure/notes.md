@@ -100,3 +100,11 @@ Ahora navegando el lado derecho:
         - [4, 5] = Complete Overlapping Range! (+7) return to top
 
 Por lo tanto, ahora en el root node, sumando left + right => 14 + 7 = 21. 
+
+3 steps for recursion:
+    - No overlap => Dont go in subtreee return 0
+    - Complete overlap => return the value 
+    - Partial overlap => Go in left subtree and right subtree and return left + right 
+
+Query = [2, 2]
+[0, 7] -> [0, 3] (Partial Overlap) -> [2, 3] (Partial Overlap) -> [2, 2] (Complete Overlap)
